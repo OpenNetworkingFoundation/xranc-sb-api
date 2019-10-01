@@ -1,0 +1,446 @@
+
+XRAN-PDU DEFINITIONS AUTOMATIC TAGS ::=
+BEGIN
+
+IMPORTS
+
+	ECGI,
+	PLMN-Identity,
+	EUTRANCellIdentifier,
+	PhysCellId,
+	CRNTI,
+	DuplexMode,
+	CandScell,
+	PCI-ARFCN,
+	AdmEstCause,
+	AdmEstResponse,
+	AdmEstStatus,
+	ReconfIndReason,
+	RelCause,
+	UEAMBR,
+	ERAB-ID,
+	ERABDirection,
+	ERABType,
+	ERABParams,
+	ERABDecision,
+	ERABResponse,
+	maxNumERABS,
+	maxNumSupQCI,
+	maxMeasNcells,
+	maxNumCQIs,
+	sinrHistSize,
+	intrfHistSize,
+	maxNumRIs,
+	HOFailureCause,
+	RXSigReport,
+	RadioRepPerServCell,
+	SchedMeasRepPerServCell,
+	PRBUsage,
+	XICIC-PA,
+	ENB-UE-S1AP-ID,
+	MME-UE-S1AP-ID,
+	ARFCN-Value,
+	QCI,
+	CACap,
+	PropScell,
+	TrafficSplitPercentage,
+	DCCap,
+	ReportConfig,
+	MeasObject,
+	MeasID,
+   L2ReportInterval
+
+FROM XRAN-API;
+
+CellConfigRequest ::= SEQUENCE {
+   ecgi ECGI,
+   ...
+}
+
+CellConfigReport ::= SEQUENCE {
+	ecgi			ECGI,
+	pci			PhysCellId,
+	cand-scells		SEQUENCE OF CandScell,
+	earfcn-dl                  ARFCN-Value,
+	earfcn-ul                  ARFCN-Value,
+	rbs-per-tti-dl             INTEGER,
+	rbs-per-tti-ul             INTEGER,
+	num-tx-antenna             INTEGER,
+	duplex-mode                DuplexMode,
+	tdd-config                 INTEGER(0..6)  OPTIONAL,
+	tdd-spl-sf-config          INTEGER(0..8)  OPTIONAL,
+	max-num-connected-ues      INTEGER,
+	max-num-connected-bearers     INTEGER,
+	max-num-ues-sched-per-tti-dl  INTEGER,
+	max-num-ues-sched-per-tti-ul  INTEGER,
+	dlfs-sched-enable             BOOLEAN,
+   featureSupportList         BIT STRING  OPTIONAL,
+	...
+}
+
+UECapabilityEnquiry ::= SEQUENCE {
+	crnti			CRNTI,
+	ecgi			ECGI,
+	...
+}
+
+UECapabilityInfo ::= SEQUENCE{
+	crnti			CRNTI,
+	ecgi			ECGI,
+	ca-cap			CACap OPTIONAL,
+	dc-cap			DCCap OPTIONAL,
+	...
+}
+
+
+UEAdmissionRequest ::= SEQUENCE {
+	crnti			CRNTI,
+	ecgi			ECGI,
+	adm-est-cause		AdmEstCause,
+	...
+}
+
+UEAdmissionResponse ::= SEQUENCE {
+        crnti                   CRNTI,
+        ecgi                    ECGI,
+        adm-est-response        AdmEstResponse,
+        ...
+}
+
+UEAdmissionStatus ::= SEQUENCE {
+        crnti                   CRNTI,
+        ecgi                    ECGI,
+        adm-est-status          AdmEstStatus,
+        ...
+}
+
+UEContextUpdate ::= SEQUENCE {
+	crnti			CRNTI,
+	ecgi			ECGI,
+	mME-UE-S1AP-ID		MME-UE-S1AP-ID,
+	eNB-UE-S1AP-ID		ENB-UE-S1AP-ID,
+	imsi			UTF8String OPTIONAL,
+	...
+}
+
+UEReconfigInd ::= SEQUENCE {
+	crnti-old		CRNTI,
+	ecgi			ECGI,
+	crnti-new		CRNTI,
+	reconfig-cause		ReconfIndReason,
+	...
+
+}
+
+UEReleaseInd ::= SEQUENCE {
+	crnti			CRNTI,
+	ecgi			ECGI,
+	release-cause		RelCause,
+	...
+}
+
+BearerAdmissionRequest ::= SEQUENCE {
+	crnti			CRNTI,
+	ecgi			ECGI,
+	ue-ambr			UEAMBR,
+	num-erabs		INTEGER(1..maxNumERABS),
+	erab-params 		ERABParams,
+	...
+}
+
+BearerAdmissionResponse ::= SEQUENCE {
+	crnti			CRNTI,
+	ecgi			ECGI,
+	num-erab-list		INTEGER(1..maxNumERABS),
+	erab-response		ERABResponse,
+	...
+}
+
+BearerAdmissionStatus ::= SEQUENCE {
+	crnti			CRNTI,
+	ecgi			ECGI,
+	num-erabs		INTEGER(1..maxNumERABS),
+	erab-status		ERABResponse,
+	...
+}
+
+BearerReleaseInd ::= SEQUENCE {
+	crnti			CRNTI,
+	ecgi			ECGI,
+	num-erabs		INTEGER(1..maxNumERABS),
+	erab-ids		SEQUENCE  (SIZE (1..maxNumERABS) ) OF  ERAB-ID,
+	...
+
+}
+
+HORequest ::= SEQUENCE {
+	crnti			CRNTI,
+	ecgi-s			ECGI,
+	ecgi-t			ECGI,
+	...
+}
+
+HOFailure ::= SEQUENCE {
+	crnti			CRNTI,
+	ecgi			ECGI,
+	cause			HOFailureCause,
+	...
+}
+
+
+HOComplete ::= SEQUENCE {
+	ecgi-t			ECGI,
+	ecgi-s			ECGI,
+	crnti-new		CRNTI,
+	...
+}
+
+
+HOCause ::= SEQUENCE {
+	crnti			CRNTI,
+	ecgi-s			ECGI,
+	ecgi-t			ECGI,
+	ho-cause		BIT STRING,
+	ho-trigger	SEQUENCE OF RXSigReport,
+	...
+}
+
+
+RXSigMeasReport ::= SEQUENCE {
+	crnti			SEQUENCE OF CRNTI,
+	ecgi			ECGI,
+	cell-meas-reports	SEQUENCE OF SEQUENCE OF  RXSigReport,
+	...
+}
+
+L2MeasConfig ::= SEQUENCE {
+	ecgi 			ECGI,
+   crnti       SEQUENCE OF CRNTI    OPTIONAL,
+	report-intervals	L2ReportInterval,
+	...
+}
+
+RadioMeasReportPerUE ::= SEQUENCE {
+	ecgi			ECGI,
+	crnti			CRNTI,
+	radio-report-serv-cells	SEQUENCE OF RadioRepPerServCell,
+	...
+}
+
+RadioMeasReportPerCell ::= SEQUENCE {
+	ecgi			ECGI,
+	pusch-intf-power-hist	SEQUENCE (SIZE(intrfHistSize)) 	OF INTEGER,
+	pucch-intf-power-hist	SEQUENCE (SIZE(intrfHistSize))	OF INTEGER,
+	...
+}
+
+
+SchedMeasReportPerUE ::= SEQUENCE {
+	ecgi			ECGI,
+	crnti			CRNTI,
+	sched-report-serv-cells	SEQUENCE OF SchedMeasRepPerServCell,
+	...
+}
+SchedMeasReportPerCell ::= SEQUENCE {
+   ecgi                    ECGI,
+	qci-vals		SEQUENCE (SIZE(1..maxNumSupQCI)) OF QCI,
+   prb-usage-pcell         PRBUsage,
+   prb-usage-scell		PRBUsage,
+   ...
+}
+
+PDCPMeasReportPerUe ::= SEQUENCE {
+	ecgi			ECGI,
+   crnti			CRNTI,
+   qci-vals                SEQUENCE (SIZE(1..maxNumSupQCI)) OF QCI,
+   data-vol-dl		SEQUENCE (SIZE(1..maxNumSupQCI)) OF INTEGER,
+	data-vol-ul		SEQUENCE (SIZE(1..maxNumSupQCI)) OF INTEGER,
+	pkt-delay-dl		SEQUENCE (SIZE(1..maxNumSupQCI)) OF INTEGER,
+	pkt-delay-ul            SEQUENCE (SIZE(1..maxNumSupQCI)) OF INTEGER,
+	pkt-discard-rate-dl	SEQUENCE (SIZE(1..maxNumSupQCI)) OF INTEGER,
+	pkt-loss-rate-dl	SEQUENCE (SIZE(1..maxNumSupQCI)) OF INTEGER,
+	pkt-loss-rate-ul	SEQUENCE (SIZE(1..maxNumSupQCI)) OF INTEGER,
+	throughput-dl		SEQUENCE (SIZE(1..maxNumSupQCI)) OF INTEGER,
+	throughput-ul		SEQUENCE (SIZE(1..maxNumSupQCI)) OF INTEGER,
+	...
+}
+
+
+ScellAdd ::= SEQUENCE {
+	crnti			CRNTI,
+	ecgi			ECGI,
+	scells-prop		SEQUENCE OF PropScell,
+	...
+}
+
+ScellAddStatus ::= SEQUENCE {
+	crnti			CRNTI,
+	ecgi			ECGI,
+	scells-ind		SEQUENCE OF PCI-ARFCN,
+	status			SEQUENCE OF ENUMERATED{success,failure},
+	...
+}
+
+ScellDelete ::= SEQUENCE {
+        crnti                   CRNTI,
+        ecgi                    ECGI,
+        scells-ind              SEQUENCE OF PCI-ARFCN,
+        ...
+}
+
+
+RRMConfig ::= SEQUENCE {
+	ecgi			ECGI,
+	crnti			SEQUENCE OF CRNTI OPTIONAL,
+	pci-arfcn		PCI-ARFCN OPTIONAL,
+	pa			SEQUENCE OF XICIC-PA OPTIONAL,
+	start-prb-dl		SEQUENCE OF INTEGER OPTIONAL,
+	end-prb-dl		SEQUENCE OF INTEGER OPTIONAL,
+	subframe-bitmask-dl	SEQUENCE OF BIT STRING (SIZE(10)) OPTIONAL,
+	p0-ue-pusch		SEQUENCE OF INTEGER(-8..7) OPTIONAL,
+	start-prb-ul		SEQUENCE OF INTEGER OPTIONAL,
+	end-prb-ul		SEQUENCE OF INTEGER OPTIONAL,
+	subframe-bitmask-ul	SEQUENCE OF BIT STRING (SIZE(10)) OPTIONAL,
+	...
+	}
+
+RRMConfigStatus ::= SEQUENCE {
+	ecgi 			ECGI,
+	crnti 			SEQUENCE OF CRNTI OPTIONAL,
+	status 			SEQUENCE OF ENUMERATED{success,failure},
+	...
+
+}
+
+SeNBAdd ::= SEQUENCE {
+	crnti			CRNTI,
+	m-ecgi			ECGI,
+	s-ecgi			ECGI,
+	...
+}
+
+SeNBAddStatus ::= SEQUENCE {
+	crnti  			CRNTI,
+	ecgi  			ECGI,
+	status 			ENUMERATED{success,failure},
+	...
+}
+
+SeNBDelete ::= SEQUENCE {
+	crnti			CRNTI,
+	m-ecgi			ECGI,
+	s-ecgi			ECGI,
+	...
+}
+
+TrafficSplitConfig ::= SEQUENCE {
+	crnti			CRNTI,
+	ecgi			ECGI,
+	traffic-split-percent	SEQUENCE OF TrafficSplitPercentage,
+	...
+}
+
+RRCMeasConfig ::= SEQUENCE {
+ecgi				ECGI,
+crnti				SEQUENCE OF CRNTI OPTIONAL,
+meas-objects	SEQUENCE OF MeasObject,
+report-configs	SEQUENCE OF ReportConfig,
+meas-ids				SEQUENCE OF MeasID,
+...
+}
+
+
+XRANC-API-ID ::= ENUMERATED {
+	cellConfigRequest,
+	cellConfigReport,
+	uEAdmissionRequest,
+	uEAdmissionResponse,
+	uEAdmissionStatus,
+	uEContextUpdate,
+	uEReconfigInd,
+	uEReleaseInd,
+	bearerAdmissionRequest,
+	bearerAdmissionResponse,
+	bearerAdmissionStatus,
+	bearerReleaseInd,
+	hORequest,
+	hOFailure,
+	hOComplete,
+	rXSigMeasReport,
+	l2MeasConfig,
+	radioMeasReportPerUE,
+	radioMeasReportPerCell,
+	schedMeasReportPerUE,
+	schedMeasReportPerCell,
+	pDCPMeasReportPerUe,
+	uECapabilityInfo,
+	uECapabilityEnquiry,
+	scellAdd,
+	scellAddStatus,
+	scellDelete,
+	rRMConfig,
+	rRMConfigStatus,
+	seNBAdd,
+	seNBAddStatus,
+	seNBDelete,
+	trafficSplitConfig,
+	hoCause,
+	rRCMeasConfig,
+	...
+}
+
+
+XRANCPDUHdr ::= SEQUENCE {
+	ver			UTF8String,
+	api-id			XRANC-API-ID,
+	...
+}
+
+XRANCPDUBody ::= CHOICE {
+	cellConfigRequest		CellConfigRequest,
+	cellConfigReport		CellConfigReport,
+	uEAdmissionRequest		UEAdmissionRequest,
+	uEAdmissionResponse		UEAdmissionResponse,
+	uEAdmissionStatus		UEAdmissionStatus,
+	uEContextUpdate		        UEContextUpdate,
+	uEReconfigInd			UEReconfigInd,
+	uEReleaseInd			UEReleaseInd,
+	bearerAdmissionRequest		BearerAdmissionRequest,
+	bearerAdmissionResponse		BearerAdmissionResponse,
+	bearerAdmissionStatus		BearerAdmissionStatus,
+	bearerReleaseInd		BearerReleaseInd,
+	hORequest			HORequest,
+	hOFailure			HOFailure,
+	hOComplete			HOComplete,
+	rXSigMeasReport			RXSigMeasReport,
+	l2MeasConfig			L2MeasConfig,
+	radioMeasReportPerUE		RadioMeasReportPerUE,
+	radioMeasReportPerCell		RadioMeasReportPerCell,
+	schedMeasReportPerUE		SchedMeasReportPerUE,
+	schedMeasReportPerCell		SchedMeasReportPerCell,
+	pDCPMeasReportPerUe 		PDCPMeasReportPerUe,
+	uECapabilityEnquiry		UECapabilityEnquiry,
+	uECapabilityInfo		UECapabilityInfo,
+	scellAdd			ScellAdd,
+	scellAddStatus			ScellAddStatus,
+	scellDelete			ScellDelete,
+	rRMConfig           RRMConfig,
+	rRMConfigStatus     RRMConfigStatus,
+	seNBAdd  			SeNBAdd,
+	seNBAddStatus			SeNBAddStatus,
+	seNBDelete			SeNBDelete,
+	trafficSplitConfig		TrafficSplitConfig,
+	hOCause						HOCause,
+	rRCMeasConfig			RRCMeasConfig,
+...
+}
+
+
+XRANCPDU ::= SEQUENCE {
+	hdr			XRANCPDUHdr,
+	body			XRANCPDUBody
+}
+
+
+
+END

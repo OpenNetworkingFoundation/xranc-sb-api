@@ -1,0 +1,332 @@
+XRAN-API DEFINITIONS AUTOMATIC TAGS ::=
+
+BEGIN
+
+ECGI ::= SEQUENCE {
+	pLMN-Identity				PLMN-Identity,
+	eUTRANcellIdentifier		EUTRANCellIdentifier,
+	...
+}
+
+PLMN-Identity ::= OCTET STRING (SIZE(3))
+
+EUTRANCellIdentifier ::= BIT STRING (SIZE (28))
+
+PhysCellId ::= INTEGER (0..503)
+
+CRNTI ::= BIT STRING (SIZE (16))
+
+QCI ::= INTEGER (0..255)
+
+BitRate	::= INTEGER (0..10000000000)
+
+
+ERAB-ID ::= INTEGER (0..15, ...)
+
+maxNumERABS INTEGER ::= 11
+
+maxNumSupQCI  INTEGER ::= 9
+
+maxMeasNcells INTEGER ::= 5
+
+maxNumCQIs INTEGER ::= 16
+
+maxNumRIs INTEGER ::= 2
+
+sinrHistSize INTEGER ::= 14
+
+intrfHistSize INTEGER ::=17
+
+RSRP-Range ::= INTEGER(0..97)
+
+RSRQ-Range ::= INTEGER(0..34)
+
+ENB-UE-S1AP-ID	::= INTEGER (0..16777215)
+
+MME-UE-S1AP-ID	::= INTEGER (0..4294967295)
+
+ARFCN-Value ::= INTEGER (0..65535)
+
+Q-OffsetRange ::= ENUMERATED {
+												dB-24, dB-22, dB-20, dB-18, dB-16, dB-14,
+												dB-12, dB-10, dB-8, dB-6, dB-5, dB-4, dB-3,
+												dB-2, dB-1, dB0, dB1, dB2, dB3, dB4, dB5,
+												dB6, dB8, dB10, dB12, dB14, dB16, dB18,
+												dB20, dB22, dB24}
+
+ThresholdEUTRA ::= CHOICE{threshold-RSRP  RSRP-Range, threshold-RSRQ RSRQ-Range}
+
+Hysteresis ::= INTEGER (-30..30)
+
+TimeToTrigger ::= ENUMERATED {ms0, ms40, ms64, ms80, ms100, ms128, ms160, ms256,ms320, ms480, ms512, ms640, ms1024, ms1280, ms2560, ms5120}
+
+
+DuplexMode ::= ENUMERATED {
+   fdd,
+   tdd
+}
+
+CandScell ::=SEQUENCE {
+	pci		PhysCellId,
+	earfcn-dl	ARFCN-Value,
+	...
+}
+
+PCI-ARFCN ::= SEQUENCE {
+	pci		PhysCellId,
+	earfcn-dl	ARFCN-Value,
+	...
+}
+
+
+AdmEstCause ::= ENUMERATED {
+	emergency (0),
+	highp-access (1),
+	mt-access (2),
+	mo-signalling (3),
+	mo-data (4),
+	...
+}
+
+AdmEstResponse ::= ENUMERATED {
+	success (0),
+        failure (1),
+        ...
+}
+
+AdmEstStatus ::= ENUMERATED {
+	success (0),
+	failure (1),
+	...
+
+}
+
+ReconfIndReason ::= ENUMERATED {
+	rlf (0),
+	ho-fail (1),
+	others (2),
+	...
+
+}
+
+RelCause ::= ENUMERATED {
+	inactivity (0),
+	rlf (1),
+	others (2),
+	...
+
+}
+
+UEAMBR ::= SEQUENCE {
+	ambr-dl			BitRate,
+	ambr-ul			BitRate,
+	...
+}
+
+ERABDirection ::= ENUMERATED {
+	dl (0),
+	ul (1),
+	both (2),
+	...
+}
+
+ERABType ::= ENUMERATED {
+	default (0),
+	dedicated (1),
+	...
+}
+
+ERABParams-Item ::= SEQUENCE {
+	id			ERAB-ID,
+	direction		ERABDirection,
+	type			ERABType,
+	qci			QCI,
+	arp			INTEGER,
+	gbr-dl			BitRate,
+	gbr-ul			BitRate,
+	mbr-dl			BitRate,
+	mbr-ul			BitRate,
+	...
+}
+
+ERABParams ::= SEQUENCE (SIZE (1..maxNumERABS)) OF ERABParams-Item
+
+ERABDecision ::= ENUMERATED {
+	success (0),
+	failure (1),
+	...
+}
+
+ERABResponse-Item ::= SEQUENCE {
+	id			ERAB-ID,
+	decision		ERABDecision,
+	...
+}
+
+ERABResponse ::= SEQUENCE (SIZE (1..maxNumERABS)) OF ERABResponse-Item
+
+
+
+HOFailureCause ::= ENUMERATED {
+	other (0),
+	...
+}
+
+
+L2MeasReportInterval ::= ENUMERATED {
+   no-report (0),
+   ms-10 (1),
+   ms-50 (2),
+   ms-100 (3),
+   ms-200 (4),
+   ms-500 (5),
+   ms-1024 (6),
+   s-10 (7),
+   min-1 (8),
+   min-2 (9),
+   min-5 (10),
+   ...
+}
+
+L2ReportInterval ::= SEQUENCE {
+   t-radio-meas-report-per-ue    L2MeasReportInterval,
+   t-radio-meas-report-per-cell  L2MeasReportInterval,
+   t-radio-sched-report-per-ue   L2MeasReportInterval,
+   t-radio-sched-report-per-cell L2MeasReportInterval,
+   t-pdcp-meas-report-per-ue     L2MeasReportInterval,
+   ...
+}
+
+RXSigReport ::= SEQUENCE {
+	pci-arfcn	PCI-ARFCN,
+	ecgi			ECGI	OPTIONAL,
+	rsrp		RSRP-Range	OPTIONAL,
+	rsrq		RSRQ-Range	OPTIONAL,
+	...
+}
+
+RadioRepPerServCell ::= SEQUENCE {
+	ecgi		ECGI,
+	cqi-hist                SEQUENCE (SIZE(maxNumCQIs))     OF INTEGER,
+   ri-hist                 SEQUENCE (SIZE(maxNumRIs))      OF INTEGER,
+   pusch-sinr-hist         SEQUENCE (SIZE(sinrHistSize))   OF INTEGER,
+   pucch-sinr-hist         SEQUENCE (SIZE(sinrHistSize))   OF INTEGER,
+	...
+}
+
+PRBUsage ::= SEQUENCE {
+	prb-usage-dl            SEQUENCE (SIZE(1..maxNumSupQCI)) OF INTEGER(0..100),
+   prb-usage-ul            SEQUENCE (SIZE(1..maxNumSupQCI)) OF INTEGER(0..100),
+	...
+}
+
+SchedMeasRepPerServCell ::=SEQUENCE {
+	ecgi		ECGI,
+	qci-vals                SEQUENCE (SIZE(1..maxNumSupQCI)) OF QCI,
+   prb-usage		PRBUsage,
+   mcs-dl                  SEQUENCE (SIZE(1..maxNumSupQCI)) OF INTEGER,
+   num-sched-ttis-dl       SEQUENCE (SIZE(1..maxNumSupQCI)) OF INTEGER,
+   mcs-ul                  SEQUENCE (SIZE(1..maxNumSupQCI)) OF INTEGER,
+   num-sched-ttis-ul       SEQUENCE (SIZE(1..maxNumSupQCI)) OF INTEGER,
+   rank-dl-1               SEQUENCE (SIZE(1..maxNumSupQCI)) OF INTEGER,
+   rank-dl-2               SEQUENCE (SIZE(1..maxNumSupQCI)) OF INTEGER,
+	...
+}
+
+XICIC-PA ::= ENUMERATED {
+	dB-minus6 (0),
+	dB-minus4dot77 (1),
+	dB-minus3 (2),
+	dB-minus1dot77 (3),
+	dB-0 (4),
+	dB-1 (5),
+	dB-2 (6),
+	dB-3 (7),
+	...
+}
+
+CACap ::=SEQUENCE {
+	band			INTEGER,
+	caclassdl		ENUMERATED{a,b,c,d,e,f,...},
+	caclassul		ENUMERATED{a,b,c,d,e,f,...},
+	crossCarrierSched	BOOLEAN,
+	...
+}
+
+PropScell ::=SEQUENCE {
+	pci-arfcn			PCI-ARFCN,
+	cross-carrier-sched-enable	BOOLEAN,
+	ca-direction			ENUMERATED{dl,ul,both},
+	deact-timer		INTEGER
+}
+
+
+DCCap ::= SEQUENCE {
+	drb-TypeSplit			ENUMERATED{supported},
+	...
+}
+
+TrafficSplitPercentage ::=SEQUENCE {
+	ecgi				ECGI,
+	traffic-percent-dl		INTEGER (0..100) OPTIONAL,
+	traffic-percent-ul		INTEGER (0..100) OPTIONAL,
+	...
+}
+
+MeasObject ::=SEQUENCE{
+dl-freq			ARFCN-Value,
+meas-cells	SEQUENCE {pci PhysCellId, cellIndividualOffset Q-OffsetRange OPTIONAL} OPTIONAL,
+...
+}
+
+ReportConfig ::= SEQUENCE{
+report-params			SEQUENCE{params CHOICE {per-param PerParam, a1param A1Param, a2param A2Param, a3param A3Param, a4param A4Param, a5param A5Param, a6param A6Param}, hysteresis Hysteresis, timetotrigger TimeToTrigger},
+triggerQuantity  ENUMERATED {rsrp,rsrq},
+reportQuantity 	ENUMERATED {sameAsTriggerQuantity, both},
+...
+}
+
+PerParam ::= SEQUENCE {
+report-interval-ms  ENUMERATED {ms-120, ms-240, ms-480,ms-640, ms-1024, ms-2048, ms-5120, ms-10240, min-1, min-6, min-12, min-30, min-60},
+...
+}
+
+A1Param ::= SEQUENCE {
+a1-Threshold	ThresholdEUTRA,
+...
+}
+
+A2Param ::= SEQUENCE {
+a2-Threshold	ThresholdEUTRA,
+...
+}
+
+A3Param ::= SEQUENCE {
+a3-Offset	INTEGER (-30..30),
+...
+}
+
+A4Param ::= SEQUENCE {
+a4-Threshold	ThresholdEUTRA,
+...
+}
+
+A5Param ::= SEQUENCE {
+a5-Threshold1	ThresholdEUTRA,
+a5-Threshold2	ThresholdEUTRA,
+...
+}
+
+A6Param ::= SEQUENCE {
+a6-Offset	INTEGER (-30..30),
+...
+}
+
+MeasID ::= SEQUENCE {
+measobject-id			INTEGER,
+reportconfig-id			INTEGER,
+action		CHOICE{addmeasid SEQUENCE OF INTEGER, delmeasid SEQUENCE OF INTEGER, hototarget BOOLEAN},
+...
+}
+
+END
